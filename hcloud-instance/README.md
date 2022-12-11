@@ -5,6 +5,7 @@ tags: [hcloud]
 ---
 
 # hcloud-instance
+*Adapted from https://github.com/ntimo/coder-hetzner-cloud-template*
 
 ## Authentication
 You have to provide a Hetzner Cloud API token (R/W) when the Template is created. The Workspace resources will be created in the project the API token belongs to...
