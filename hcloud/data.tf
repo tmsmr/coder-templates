@@ -96,15 +96,11 @@ locals {
 }
 
 locals {
-  agent_arch = try(
-    lookup(
-      {
-        "x86" = "amd64"
-        "arm" = "arm64"
-      },
-      local.hcloud_server_types[data.coder_parameter.hcloud_server_type.value].architecture,
-      "amd64"
-    ),
-    "amd64"
+  agent_arch = lookup(
+    {
+      "x86" = "amd64"
+      "arm" = "arm64"
+    },
+    local.hcloud_server_types[data.coder_parameter.hcloud_server_type.value].architecture
   )
 }

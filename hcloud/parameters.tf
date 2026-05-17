@@ -56,12 +56,12 @@ data "coder_parameter" "hcloud_server_os" {
 data "coder_parameter" "home_volume_size" {
   name         = "home_volume_size"
   display_name = "Home Volume Size"
-  description  = "How large would you like your home volume to be (in GB)?"
+  description  = "How large would you like your home volume to be (in GB)? Minimum 10 GB."
   type         = "number"
   default      = "20"
   mutable      = false
   validation {
-    min = 1
+    min = 10
     max = 500
   }
 }

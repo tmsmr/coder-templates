@@ -51,12 +51,16 @@ write_files:
 runcmd:
 %{ if home_volume_label != "" ~}
   - |
-    until [ -e /dev/disk/by-id/scsi-0HC_Volume_${volume_id} ]; do
+    DEVICE="/dev/disk/by-id/scsi-0HC_Volume_${volume_id}"
+    until [ -e "$DEVICE" ]; do sleep 1; done
+    until mountpoint -q /home/${username} || mount -o discard,defaults "$DEVICE" /home/${username}; do
       sleep 1
     done
 %{ endif ~}
-  - mount -a
-  - cp /etc/skel/.* /home/${username}
+  - |
+    if [ ! -f /home/${username}/.bashrc ]; then
+      cp -rT /etc/skel /home/${username}
+    fi
   - mkdir /home/${username}/projects
   - chown -R ${username}:${username} /home/${username}
   - systemctl enable coder-agent
