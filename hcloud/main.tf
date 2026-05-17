@@ -30,6 +30,13 @@ resource "hcloud_server" "server" {
     "coder_workspace_name"  = data.coder_workspace.me.name,
     "coder_workspace_owner" = data.coder_workspace_owner.me.name,
   }
+
+  lifecycle {
+    precondition {
+      condition     = local.hcloud_server_types[data.coder_parameter.hcloud_server_type.value].architecture == split(";", data.coder_parameter.hcloud_server_os.value)[1]
+      error_message = "Selected OS architecture does not match server type architecture."
+    }
+  }
 }
 
 resource "hcloud_volume" "volume" {
