@@ -1,5 +1,4 @@
 #cloud-config
-
 users:
   - name: ${username}
     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
@@ -7,15 +6,21 @@ users:
     shell: /bin/bash
 packages:
   - git
-  - curl
   - jq
+%{ if home_volume_label != "" ~}
+fs_setup:
+  - device: /dev/disk/by-id/scsi-0HC_Volume_${volume_id}
+    filesystem: ext4
+    label: ${home_volume_label}
+    overwrite: false
 mounts:
   - [
-      "${volume_path}",
+      "/dev/disk/by-id/scsi-0HC_Volume_${volume_id}",
       "/home/${username}",
       ext4,
       "discard,defaults",
     ]
+%{ endif ~}
 write_files:
   - path: /opt/coder/init
     permissions: "0755"
@@ -28,6 +33,7 @@ write_files:
       Description=Coder Agent
       After=network-online.target
       Wants=network-online.target
+
       [Service]
       User=${username}
       ExecStart=/opt/coder/init
@@ -36,11 +42,22 @@ write_files:
       RestartSec=10
       TimeoutStopSec=90
       KillMode=process
+
       OOMScoreAdjust=-900
       SyslogIdentifier=coder-agent
+
       [Install]
       WantedBy=multi-user.target
 runcmd:
-  - chown ${username}:${username} /home/${username}
+%{ if home_volume_label != "" ~}
+  - |
+    until [ -e /dev/disk/by-id/scsi-0HC_Volume_${volume_id} ]; do
+      sleep 1
+    done
+%{ endif ~}
+  - mount -a
+  - cp /etc/skel/.* /home/${username}
+  - mkdir /home/${username}/projects
+  - chown -R ${username}:${username} /home/${username}
   - systemctl enable coder-agent
   - systemctl start coder-agent
