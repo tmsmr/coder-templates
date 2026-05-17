@@ -29,3 +29,19 @@ Coder workspace templates (IaC). Currently ships one template: `hcloud/` (Hetzne
 - **cloud-config is the bootstrap contract**: `cloud-config.yaml.tftpl` handles all first-boot setup: persistent volume mount at `/home/coder`, Coder agent systemd service, and the `projects/` directory. Changes to volume mounting or agent startup paths must stay consistent with `main.tf`.
 - **Pinned module versions**: `apps.tf` pins JetBrains (`1.4.0`) and OpenCode (`0.1.2`) module versions. Upgrading these may require matching Coder provider version changes; verify in `.terraform.lock.hcl`.
 - **Firewall is default-deny + ICMP**: `firewall.tf` creates a firewall with only ICMP ingress allowed. All other inbound traffic is dropped by default.
+
+## Architecture Decision Records (ADRs)
+
+- The `adr/` directory contains decision records for suggestions that were reviewed and intentionally not implemented.
+- **Before proposing a new change that touches volume lifecycle, firewall rules, SSH access, volume formatting, or snapshots**, check the existing ADRs to see if the topic has already been discussed:
+  ```bash
+  ls adr/
+  ```
+- Current ADRs:
+  - `001-no-prevent-destroy-on-volume.md`
+  - `002-default-deny-firewall.md`
+  - `003-no-manual-volume-formatting.md`
+  - `004-no-ssh-keys-in-template.md`
+  - `005-no-automated-snapshots.md`
+- If an ADR exists, respect the decision or open a new discussion rather than silently re-introducing the same suggestion.
+
